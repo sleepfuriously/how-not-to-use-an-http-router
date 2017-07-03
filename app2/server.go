@@ -17,6 +17,7 @@ func start(shutdown chan struct{}) {
 			log.Printf("Httpserver: ListenAndServe() error: %s", err)
 		}
 	}()
+	
 	<-shutdown
 	srv.Shutdown(nil)
 }
