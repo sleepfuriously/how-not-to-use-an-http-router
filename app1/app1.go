@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 	"strconv"
 	"strings"
 )
+
+const addr = ":8000"
 
 var knownUsers = map[int]bool{}
 
@@ -105,22 +106,13 @@ func ShiftPath(p string) (head, tail string) {
 	return p[1:i], p[i:]
 }
 
-func start(shutdown chan struct{}) {
-	srv := &http.Server{
-		Addr: ":8000",
-		Handler: &App{
-			UserHandler: new(UserHandler),
-		},
+func serve() {
+	a := &App{
+		UserHandler: new(UserHandler),
 	}
-	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			log.Printf("Httpserver: ListenAndServe() error: %s", err)
-		}
-	}()
-	<-shutdown
-	srv.Shutdown(nil)
+	http.ListenAndServe(addr, a)
 }
 
 func main() {
-	start(nil)
+	serve()
 }

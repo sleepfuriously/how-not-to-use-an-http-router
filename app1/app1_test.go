@@ -7,9 +7,7 @@ import (
 )
 
 func TestApp(t *testing.T) {
-	shutdown := make(chan struct{})
-	defer close(shutdown)
-	go start(shutdown)
+	go serve()
 
 	check(t, http.MethodGet, "", http.StatusNotFound)
 	check(t, http.MethodGet, "/", http.StatusNotFound)
@@ -28,7 +26,7 @@ func TestApp(t *testing.T) {
 }
 
 func check(t *testing.T, method, path string, expectedStatusCode int) {
-	req, err := http.NewRequest(method, "http://localhost:8000"+path, nil)
+	req, err := http.NewRequest(method, "http://localhost"+addr+path, nil)
 	if err != nil {
 		t.Fatal(method, path, err)
 	}
