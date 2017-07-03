@@ -7,7 +7,9 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	go start()
+	shutdown := make(chan struct{})
+	defer close(shutdown)
+	go start(shutdown)
 
 	check(t, http.MethodGet, "", http.StatusNotFound)
 	check(t, http.MethodGet, "/", http.StatusNotFound)

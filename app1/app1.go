@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"path"
 	"strconv"
@@ -104,13 +105,22 @@ func ShiftPath(p string) (head, tail string) {
 	return p[1:i], p[i:]
 }
 
-func start() {
-	a := &App{
-		UserHandler: new(UserHandler),
+func start(shutdown chan struct{}) {
+	srv := &http.Server{
+		Addr: ":8000",
+		Handler: &App{
+			UserHandler: new(UserHandler),
+		},
 	}
-	http.ListenAndServe(":8000", a)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Printf("Httpserver: ListenAndServe() error: %s", err)
+		}
+	}()
+	<-shutdown
+	srv.Shutdown(nil)
 }
 
 func main() {
-	start()
+	start(nil)
 }
